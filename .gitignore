@@ -1,0 +1,7 @@
+# Ignore macOS file
+.DS_STORE
+
+# Ignore npm packages
+img_server/node_modules
+web/node_modules
+
