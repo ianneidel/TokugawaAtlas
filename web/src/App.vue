@@ -11,8 +11,8 @@
 
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
-import Navbar from "./components/Navbar.vue";
-import WebMap from './components/WebMap.vue';
+import Navbar from "./components/NewNavBar.vue";
+import WebMap from './components/NewWebMap.vue';
 
 Vue.use(BootstrapVue)
 
