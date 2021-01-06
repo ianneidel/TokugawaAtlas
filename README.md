@@ -1,2 +1,28 @@
-# TokugawaAtlas
-The main project in the inaugural two years of the DTL is mapping Japan’s feudal territories across 270 years and down to each of the 60,000 villages.   Tokugawa Japan has an enormous volume of surviving documentation and a sophisticated historiography. Accurate territorial maps that go beyond small regions and individual years, however, have remained elusive. Near-comprehensive shogunal surveys of feudal ownership exist for two moments in time, 1664 and ca. 1868. The first of these has been turned into maps by Nishioka and Hattori in 1956 and by Drixler in 2015, but neither fully renders the complex ownership structures of some regions. The problem is not, with a few exceptions, that the information does not survive, but that the volume and diversity of sources can be overwhelming. Rather than trying to modify existing maps that were created from top-down information, our team is reassembling Tokugawa Japan’s territorial structure from its basic units, the villages. We identify each village in space and then track its history through the early modern period. Villages can emerge and disappear, split and merge. Some were ruled by the same domain for centuries. Others were split between a changing cast of forty different bannermen and daimyo. By grouping individual villages, we recreate the changing shapes of individual domains, bannerman possessions, and religious territories.  The lab combines a close evaluation of archival maps and historical texts with digital techniques such as text mining, natural language processing, neural networks, and geodatabases. We aspire to communicate the results with full transparency about any uncertainties that remain unresolved.  The resulting maps and geospatial objects will be freely accessible through a web interface.
+# Edo Maps
+Edo Maps is a Vue application that interacts with ArcGIS Online to display an interactive map of Japan during the Edo Period (1603-1868). 
+
+## Starting the Image server
+First, start the image server by going into `img_server/`. 
+
+Install the dependencies with the following command 
+```
+npm install
+```
+
+Then, start the image server with 
+```
+node server
+```
+
+## Starting the application 
+To run the app, go into `edmaps/` and simply run
+```
+npm install
+```
+
+And 
+```
+npm run serve
+```
+
+
