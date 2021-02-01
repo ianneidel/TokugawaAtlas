@@ -2,6 +2,7 @@
 Tokugawa Atlas is a Vue application that interacts with ArcGIS Online to display an interactive map of Japan during the Edo Period (1603-1868). 
 For more information about the project, visit [Yale's Official Page](https://dtl.macmillan.yale.edu/digital-atlas-tokugawa-japan).
 
+### Demo
 A short video demo of current beta functionality and other images of the app can be found [here](https://drive.google.com/drive/folders/1hCvLJrM37QLcicHKX1_Axm2zy0yZgShD?usp=sharing).
 
 ## Prerequisites
