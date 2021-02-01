@@ -7,27 +7,33 @@ For more information about the project, visit [Yale's Official Page](https://dtl
 
 ## Setup
 
-### 1. Image Server
-First, start the image server by going into `img_server/`. 
+### 1. Image Server Backend
+First, start the image server by entering `backend/` directory. 
 
 Install the dependencies with the following command 
 ```
 npm install
 ```
 
-Then, start the image server with 
+Then, start the server with 
 ```
 node server
 ```
 
 ## Web Application
-To run the app, go into `edmaps/` and simply run
+To run the app, in another window navigate to `frontend/`.
+
+Install dependencies with:
 ```
 npm install
 ```
 
-And 
+Compile and run the Vue development server with:
 ```
 npm run serve
 ```
+
+## Notes
+- Dependencies only need to be installed once
+- Vue dev server automatically updates when files in project updated, no need to restart.
 
