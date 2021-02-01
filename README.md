@@ -20,7 +20,7 @@ Then, start the server with
 node server
 ```
 
-## Web Application
+### 2. Web Application
 To run the app, in another window navigate to `frontend/`.
 
 Install dependencies with:
