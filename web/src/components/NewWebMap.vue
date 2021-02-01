@@ -102,6 +102,12 @@ export default {
       // };
       // this.layers.domains.labelingInfo = [domainLabelClass];
 
+      /*
+      ========================================================================================== 
+      ||        Sql Queries used later on feature layers based on user selection              ||
+      ==========================================================================================
+      */
+
       var domainForm = form.domains;
       var villageForm = form.villages;
       var gunForm = form.guns;
@@ -271,6 +277,12 @@ export default {
           "content": "{Dump_Villages_SIZE}",
       };
 
+      /*
+      ========================================================================================== 
+      ||              Feature Layers Hosted With Private ArcGIS REST Framework                ||
+      ==========================================================================================
+      */
+
       var villages = new FeatureLayer({
         url:
           "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_villages/MapServer/0",
@@ -402,121 +414,121 @@ export default {
       this.layers.domains = domains;
       
 
-      // domains.renderer = {
-      //   type: "unique-value",  // autocasts as new UniqueValueRenderer()
-      //   field: "Dump_Domain_Domain_KJ",
-      //   defaultSymbol: { type: "simple-fill" },
-      // };
+      domains.renderer = {
+        type: "unique-value",  // autocasts as new UniqueValueRenderer()
+        field: "Dump_Domain_Domain_KJ",
+        defaultSymbol: { type: "simple-fill" },
+      };
 
-      // domains.renderer.addUniqueValueInfo({
-      //   value: "前橋藩",
-      //   symbol: {
-      //     type: "simple-fill",
-      //     color: "blue"
-      //   }
-      // });
+      domains.renderer.addUniqueValueInfo({
+        value: "前橋藩",
+        symbol: {
+          type: "simple-fill",
+          color: "blue"
+        }
+      });
 
-      // var aikyuuTemplate = {
-      //     "title": "Aikyuu: {Dump_Domain_Domain_KJ}",
-      // };
+      var aikyuuTemplate = {
+          "title": "Aikyuu: {Dump_Domain_Domain_KJ}",
+      };
     
-      // var aikyuu = new FeatureLayer({
-      //   url:
-      //     "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_aikyuu/MapServer/0",
-      //   outfields: ["*"],
-      //   title: "Aikyuu",
-      //   visible: false,
-      //   minScale: 1000000,
-      //   opacity: 0.75,
-      //   popupTemplate: aikyuuTemplate,
-      // });
-      // map.layers.add(aikyuu);
+      var aikyuu = new FeatureLayer({
+        url:
+          "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_aikyuu/MapServer/0",
+        outfields: ["*"],
+        title: "Aikyuu",
+        visible: false,
+        minScale: 1000000,
+        opacity: 0.75,
+        popupTemplate: aikyuuTemplate,
+      });
+      map.layers.add(aikyuu);
 
 
-      // var bakuryouTemplate = {
-      //     "title": "Bakuryou: {Dump_Domain_Domain_KJ}",
-      // };
+      var bakuryouTemplate = {
+          "title": "Bakuryou: {Dump_Domain_Domain_KJ}",
+      };
     
-      // var bakuryou = new FeatureLayer({
-      //   url:
-      //     "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_bakuryou/MapServer/0",
-      //   outfields: ["*"],
-      //   title: "Bakuryou",
-      //   visible: false,
-      //   minScale: 1000000,
-      //   opacity: 0.75,
-      //   popupTemplate: bakuryouTemplate,
-      // });
-      // map.layers.add(bakuryou);
+      var bakuryou = new FeatureLayer({
+        url:
+          "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_bakuryou/MapServer/0",
+        outfields: ["*"],
+        title: "Bakuryou",
+        visible: false,
+        minScale: 1000000,
+        opacity: 0.75,
+        popupTemplate: bakuryouTemplate,
+      });
+      map.layers.add(bakuryou);
 
 
-      // var templeLandsTemplate = {
-      //     "title": "Temple Lands: {Dump_Domain_Domain_KJ}",
-      // };
+      var templeLandsTemplate = {
+          "title": "Temple Lands: {Dump_Domain_Domain_KJ}",
+      };
     
-      // var templeLands = new FeatureLayer({
-      //   url:
-      //     "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_temple_lands/MapServer/0",
-      //   outfields: ["*"],
-      //   title: "Temple Lands",
-      //   visible: false,
-      //   minScale: 1000000,
-      //   opacity: 0.75,
-      //   popupTemplate: templeLandsTemplate,
-      // });
-      // // map.layers.add(templeLands);
+      var templeLands = new FeatureLayer({
+        url:
+          "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_temple_lands/MapServer/0",
+        outfields: ["*"],
+        title: "Temple Lands",
+        visible: false,
+        minScale: 1000000,
+        opacity: 0.75,
+        popupTemplate: templeLandsTemplate,
+      });
+      // map.layers.add(templeLands);
 
-      // var hatamotoTemplate = {
-      //     "title": "Hatamoto: {Dump_Domain_Domain_KJ}",
-      // };
+      var hatamotoTemplate = {
+          "title": "Hatamoto: {Dump_Domain_Domain_KJ}",
+      };
     
-      // var hatamoto = new FeatureLayer({
-      //   url:
-      //     "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_hatamoto/MapServer/0",
-      //   outfields: ["*"],
-      //   title: "Hatamoto",
-      //   visible: false,
-      //   minScale: 1000000,
-      //   opacity: 0.75,
-      //   popupTemplate: hatamotoTemplate,
-      // });
-      // // // map.layers.add(hatamoto);
+      var hatamoto = new FeatureLayer({
+        url:
+          "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_hatamoto/MapServer/0",
+        outfields: ["*"],
+        title: "Hatamoto",
+        visible: false,
+        minScale: 1000000,
+        opacity: 0.75,
+        popupTemplate: hatamotoTemplate,
+      });
+      // // map.layers.add(hatamoto);
       
       
-      // var azukarichiTemplate = {
-      //     "title": "Azukarichi: {Dump_Domain_Domain_KJ}",
-      // };
+      var azukarichiTemplate = {
+          "title": "Azukarichi: {Dump_Domain_Domain_KJ}",
+      };
     
-      // var azukarichi = new FeatureLayer({
-      //   url:
-      //     "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_azukarichi/MapServer/0",
-      //   outfields: ["*"],
-      //   title: "Azukarichi",
-      //   visible: false,
-      //   minScale: 1000000,
-      //   opacity: 0.75,
-      //   popupTemplate: azukarichiTemplate,
-      // });
-      // map.layers.add(azukarichi);
+      var azukarichi = new FeatureLayer({
+        url:
+          "https://www.hgis-indias.net:6443/arcgis/rest/services/DTL/dtl_azukarichi/MapServer/0",
+        outfields: ["*"],
+        title: "Azukarichi",
+        visible: false,
+        minScale: 1000000,
+        opacity: 0.75,
+        popupTemplate: azukarichiTemplate,
+      });
+      map.layers.add(azukarichi);
 
 
       // Create a popup template for uncertain belongings
-      // let popupUncertainBelongings = {
-      //   "title": "Uncertain Belonging",
-      //   "content": "<b>Probable 1:</b> {probable_1}<br>\
-      //               <b>Possible 1:</b> {possible_1}<br>\
-      //               <b>Start Valid:</b> {START_vali}<br>\
-      //               <b>End Valid:</b> {END_valid}<br>"
-      // }
+      let popupUncertainBelongings = {
+        "title": "Uncertain Belonging",
+        "content": "<b>Probable 1:</b> {probable_1}<br>\
+                    <b>Possible 1:</b> {possible_1}<br>\
+                    <b>Start Valid:</b> {START_vali}<br>\
+                    <b>End Valid:</b> {END_valid}<br>"
+      }
 
       // Add uncertain-belonging layer
-      // let uncertain_belonging = new FeatureLayer({
-      //   url:
-      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/1?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
-      //   outfields: ["*"],
-      //   popupTemplate: popupUncertainBelongings,
-      // })
-      // map.layers.add(uncertain_belonging)
+      let uncertain_belonging = new FeatureLayer({
+        url:
+          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/1?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
+        outfields: ["*"],
+        popupTemplate: popupUncertainBelongings,
+      })
+      map.layers.add(uncertain_belonging)
 
       var domainGroupLayer = new GroupLayer({
         title: "Territorial Ownership",
@@ -529,79 +541,85 @@ export default {
       map.layers.add(domainGroupLayer);
 
       /* =====================================================================================================
-                                  CODE TO FOR CROSS HATCHING TO WORK
+                                  Sample work-around code to enable cross hatching
       =======================================================================================================*/
 
-      // // Symbol for FUKUI / OONO
-      // const FukuiOono = {
-      //   type: "picture-fill",
-      //   url: "http://localhost:3000/red_yellow.jpg",
-      //   width: 500,
-      //   height: 500
-      // };
 
-      // // Symbol for SABE / FUKUI
-      // const SabaeFukui = {
-      //   type: "picture-fill",
-      //   url: "http://localhost:3000/red_green.jpg",
-      //   width: 500,
-      //   height: 500
-      // };
+      /*
+        Image-fill symbollogy to mimic cross hatching. Images are pre-generated with addresses hard coded
+         When implemented properly this will make calls to bakend image server to serve these images dynamically
+      */
 
-      // // Symbol for all others
-      // const otherSym = {
-      //   type: "simple-fill",
-      //   // style: "square",
-      //   // size: 18,
-      //   color: [26, 26, 26, 1]
-      // };
+      // Symbol for FUKUI / OONO
+      const FukuiOono = {
+        type: "picture-fill",
+        url: "http://localhost:3000/red_yellow.jpg",
+        width: 500,
+        height: 500
+      };
 
-      // // Create a renderer to render specific symbols on top of Boundaries layer
-      // const boundaryRenderer = {
-      //   type: "unique-value", // autocasts as new UniqueValueRenderer()
-      //   legendOptions: {
-      //     title: "Uncertanties:"
-      //   },
-      //   defaultSymbol: otherSym,
-      //   defaultLabel: "DEFAULT LABEL",
-      //   field: "changefr_2",
-      //   field2: "changetoDo",
-      //   fieldDelimiter: ", ",
-      //   uniqueValueInfos: [
-      //     {
-      //       value: "Fukui, Oono", // code for fukui to oono boundaries
-      //       symbol: FukuiOono,
-      //       label: "Fukui to Oono"
-      //     },
-      //     {
-      //       value: "Sabae, Fukui", // code for sabae to fukui boundaries
-      //       symbol: SabaeFukui,
-      //       label: "Sabae to Fukui"
-      //     }
-      //   ]
-      // };
+      // Symbol for SABE / FUKUI
+      const SabaeFukui = {
+        type: "picture-fill",
+        url: "http://localhost:3000/red_green.jpg",
+        width: 500,
+        height: 500
+      };
+
+      // Symbol for all others
+      const otherSym = {
+        type: "simple-fill",
+        // style: "square",
+        // size: 18,
+        color: [26, 26, 26, 1]
+      };
+
+      // Create a renderer to render specific symbols on top of Boundaries layer
+      const boundaryRenderer = {
+        type: "unique-value", // autocasts as new UniqueValueRenderer()
+        legendOptions: {
+          title: "Uncertanties:"
+        },
+        defaultSymbol: otherSym,
+        defaultLabel: "DEFAULT LABEL",
+        field: "changefr_2",
+        field2: "changetoDo",
+        fieldDelimiter: ", ",
+        uniqueValueInfos: [
+          {
+            value: "Fukui, Oono", // code for fukui to oono boundaries
+            symbol: FukuiOono,
+            label: "Fukui to Oono"
+          },
+          {
+            value: "Sabae, Fukui", // code for sabae to fukui boundaries
+            symbol: SabaeFukui,
+            label: "Sabae to Fukui"
+          }
+        ]
+      };
 
       // Crete a popup template for uncertain boundaries
-      // let boundaryChangePopup = {
-      //   "title": "Boundary Change",
-      //   "content": "<b>Change From 2:</b> {changefr_2}<br>\
-      //               <b>Change To Do:</b> {changetoDo}<br>\
-      //               <b>Start Valid:</b> {START_vali}<br>\
-      //               <b>End Valid:</b> {END_valid}<br>"
-      // }
+      let boundaryChangePopup = {
+        "title": "Boundary Change",
+        "content": "<b>Change From 2:</b> {changefr_2}<br>\
+                    <b>Change To Do:</b> {changetoDo}<br>\
+                    <b>Start Valid:</b> {START_vali}<br>\
+                    <b>End Valid:</b> {END_valid}<br>"
+      }
 
-      // // Add boundary-changes layer
-      // let boundary_changes = new FeatureLayer({
-      //   url:
-      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/0?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
-      //   renderer: boundaryRenderer,
-      //   outfields: ["*"],
-      //   popupTemplate: boundaryChangePopup,
-      // })
-      // map.layers.add(boundary_changes)
+      // Add boundary-changes layer
+      let boundary_changes = new FeatureLayer({
+        url:
+          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/0?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
+        renderer: boundaryRenderer,
+        outfields: ["*"],
+        popupTemplate: boundaryChangePopup,
+      })
+      map.layers.add(boundary_changes)
 
       /* =====================================================================================================
-                                  END OF CODE FOR CROboSS HATCHING
+                                  End of Cross Hatching Code
       =======================================================================================================*/
     
       // Add the time slider widget
