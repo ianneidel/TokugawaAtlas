@@ -18,6 +18,43 @@ export default {
     return{
       view: null,
       isMounted: false,
+
+      // Objects with feature layer meta data so mounted code does not have to change if data hosted elsewhere or data fields change
+      layerInfo: {
+        guns: {
+          layer_name: "Guns",
+          service_url: "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Gun_Simple/FeatureServer/0",
+          fields: [
+            { label: "Gun Name", id: "Dump_Gun_1", visible: true, search: true},
+            { label: "Kuni Kanji",id: "Dump_Gun_3", visible: true, search: true},
+            { label: "Kuni Romaji", id: "Dump_Gun_4", visible: true, search: true},
+            { label: "Size", id: "Dump_Gun_S", visible: true, search: false},
+            { label: "Year (Int)", id: "Year", visible: true, search: false},
+            { label: "Check", id: "check_", visible: true, search: false},
+            { label: "Start (int)", id: "START", visible: true, search: false},
+            { label: "End (int)", id: "END_", visible: true, search: false},
+            { label: "Year", id: "Year_dt	", visible: true, search: false},
+            { label: "Start", id: "Start_dt", visible: true, search: false},
+            { label: "End", id: "End_dt", visible: true, search: false},
+          ],
+        }, 
+        villages: {
+          layer_name: "Villages",
+          service_url: "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Villages_simp/FeatureServer/0",
+          fields: [
+            { label: "Village Name", id: "Dump_Vil_1", visible: true, search: true},
+            { label: "Year (Int)", id: "Year", visible: true, search: false},
+            { label: "Start (int)", id: "START", visible: true, search: false},
+            { label: "End (int)", id: "END_", visible: true, search: false},
+            { label: "Start", id: "Start_dt", visible: true, search: false},
+            { label: "End", id: "End_dt", visible: true, search: false},
+          ],
+        }
+      }
+        
+      // Map data field names to generic names so code does not have to change when data representation does
+      // Old data laters for Fukui only
+      // gun_service_url: "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/3?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
     }
   },
   mounted() {
@@ -35,12 +72,36 @@ export default {
       "esri/widgets/Print",
       "esri/widgets/Print/TemplateOptions",
       ], { css: true })
-    .then(([ArcGISMap, MapView, FeatureLayer, TimeSlider, LayerList, Legend, Search, Expand, BasemapGallery, Print, TemplateOptions]) => {
-      const map = new ArcGISMap({
-        basemap: 'gray-vector'
-      });
+    .then(([ArcGISMap, MapView, FeatureLayer, TimeSlider, LayerList, Legend, Search, Expand, BasemapGallery,
+            Print, TemplateOptions]) => {
+      
+      /* ===================================== HELPER FUNCTIONS =========================================== */
 
-      // Instantiate the map UI using the view fature
+      let genPopup = (title, fields) => {
+        let fieldInfos = [];
+        fields.forEach(field => {
+          // if (field.visable)
+            // content += `<b>${field.name}: </b> {${field.id}}<br>`
+          fieldInfos.push({
+            fieldName: field.id,
+            label: field.label,
+            visible: field.visible
+          })
+        })
+
+        // Return expected format for popup to autocast as FieldContent object
+        return { 
+          "title": `<b>${title}</b>`, 
+          "content": [{
+            type: "fields",
+            fieldInfos: fieldInfos, 
+          }],
+        };
+      }
+
+      /* =====================================  INITIALIZE MAP  ============================================= */
+
+      const map = new ArcGISMap({ basemap: 'gray-vector' });
       this.view = new MapView({
         container: this.$el,
         map: map,
@@ -49,142 +110,151 @@ export default {
         // scale: 4155583.4197442674,
       });
 
+      /* =====================================   INIT LAYERS    ============================================= */
 
-
-      // Add Gun Layer
-      var gun = new FeatureLayer({
-        url:
-          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/3?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-"
+      let gun = new FeatureLayer({ 
+        url: this.layerInfo.guns.service_url,
+        popupTemplate: genPopup("Gun Information", this.layerInfo.guns.fields),
+        outfields: ["*"],
       });
       map.layers.add(gun);
-
-      let content_string = "<b>Gun Name Kanji:</b> {gun_name_K}<br>\
-                            <b>Gun Name Romaji:</b> {gun_name_R}<br>\
-                            <b>Kuni Name:</b> {Kuni_name_}<br>\
-                            <b>Kuni Name (Romaji):</b> {Kuni_name1}<br>\
-                            <b>Start Valid:</b> {START_VALI}<br>\
-                            <b>End Valid:</b> {END_VALID}"
-
-      // Create a popup template for villages from gun:
-      let popupVillages = {
-        "title": "{fukuivil_2}",
-        "content": content_string,
-      }
-
-      // Add villages to domains
-      var villages_to_domains = new FeatureLayer({
-        url:
-          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/4?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
-        symbol: {
-          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-          color: [51, 51, 204, 0.9],
-          style: "solid",
-          outline: {  // autocasts as new SimpleLineSymbol()
-            color: "black",
-            width: 1
-          }
-        }
-      });
-      map.layers.add(villages_to_domains);
-
-      // Add villages to gun
-      var villages_to_gun = new FeatureLayer({
-        url:
-          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/5?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
+      
+      let villages = new FeatureLayer({ 
+        url: this.layerInfo.villages.service_url,
+        popupTemplate: genPopup("Village Information", this.layerInfo.villages.fields),
         outfields: ["*"],
-        popupTemplate: popupVillages
       });
-      map.layers.add(villages_to_gun);
+      map.layers.add(villages);
 
-      // Create a popup template for uncertain belongings
-      let popupUncertainBelongings = {
-        "title": "Uncertain Belonging",
-        "content": "<b>Probable 1:</b> {probable_1}<br>\
-                    <b>Possible 1:</b> {possible_1}<br>\
-                    <b>Start Valid:</b> {START_vali}<br>\
-                    <b>End Valid:</b> {END_valid}<br>"
-      }
+      // // Specify how the gun layer popup is displayed
+      // let content_string = "\
+      //   <b>Gun Name Kanji:</b> {gun_name_K}<br>\
+      //   <b>Gun Name Romaji:</b> {gun_name_R}<br>\
+      //   <b>Kuni Name:</b> {Kuni_name_}<br>\
+      //   <b>Kuni Name (Romaji):</b> {Kuni_name1}<br>\
+      //   <b>Start Valid:</b> {START_VALI}<br>\
+      //   <b>End Valid:</b> {END_VALID}"
 
-      // Add uncertain-belonging layer
-      let uncertain_belonging = new FeatureLayer({
-        url:
-          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/1?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
-        outfields: ["*"],
-        popupTemplate: popupUncertainBelongings,
-      })
-      map.layers.add(uncertain_belonging)
+      // // Create a popup template for villages from gun:
+      // let popupVillages = {
+      //   "title": "{fukuivil_2}",
+      //   "content": content_string,
+      // }
+
+      // // Add villages to domains
+      // var villages_to_domains = new FeatureLayer({
+      //   url:
+      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/4?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
+      //   symbol: {
+      //     type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+      //     color: [51, 51, 204, 0.9],
+      //     style: "solid",
+      //     outline: {  // autocasts as new SimpleLineSymbol()
+      //       color: "black",
+      //       width: 1
+      //     }
+      //   }
+      // });
+      // map.layers.add(villages_to_domains);
+
+      // // Add villages to gun
+      // var villages_to_gun = new FeatureLayer({
+      //   url:
+      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/5?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
+      //   outfields: ["*"],
+      //   popupTemplate: popupVillages
+      // });
+      // map.layers.add(villages_to_gun);
+
+      // // Create a popup template for uncertain belongings
+      // let popupUncertainBelongings = {
+      //   "title": "Uncertain Belonging",
+      //   "content": "<b>Probable 1:</b> {probable_1}<br>\
+      //               <b>Possible 1:</b> {possible_1}<br>\
+      //               <b>Start Valid:</b> {START_vali}<br>\
+      //               <b>End Valid:</b> {END_valid}<br>"
+      // }
+
+      // // Add uncertain-belonging layer
+      // let uncertain_belonging = new FeatureLayer({
+      //   url:
+      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/1?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
+      //   outfields: ["*"],
+      //   popupTemplate: popupUncertainBelongings,
+      // })
+      // map.layers.add(uncertain_belonging)
 
       /* =====================================================================================================
                                   CODE TO FOR CROSS HATCHING TO WORK
       =======================================================================================================*/
 
       // Symbol for FUKUI / OONO
-      const FukuiOono = {
-        type: "picture-fill",
-        url: "http://localhost:3000/red_yellow.jpg",
-        width: 500,
-        height: 500
-      };
+      // const FukuiOono = {
+      //   type: "picture-fill",
+      //   url: "http://localhost:3000/red_yellow.jpg",
+      //   width: 500,
+      //   height: 500
+      // };
 
-      // Symbol for SABE / FUKUI
-      const SabaeFukui = {
-        type: "picture-fill",
-        url: "http://localhost:3000/red_green.jpg",
-        width: 500,
-        height: 500
-      };
+      // // Symbol for SABE / FUKUI
+      // const SabaeFukui = {
+      //   type: "picture-fill",
+      //   url: "http://localhost:3000/red_green.jpg",
+      //   width: 500,
+      //   height: 500
+      // };
 
-      // Symbol for all others
-      const otherSym = {
-        type: "simple-fill",
-        // style: "square",
-        // size: 18,
-        color: [26, 26, 26, 1]
-      };
+      // // Symbol for all others
+      // const otherSym = {
+      //   type: "simple-fill",
+      //   // style: "square",
+      //   // size: 18,
+      //   color: [26, 26, 26, 1]
+      // };
 
-      // Create a renderer to render specific symbols on top of Boundaries layer
-      const boundaryRenderer = {
-        type: "unique-value", // autocasts as new UniqueValueRenderer()
-        legendOptions: {
-          title: "Uncertanties:"
-        },
-        defaultSymbol: otherSym,
-        defaultLabel: "DEFAULT LABEL",
-        field: "changefr_2",
-        field2: "changetoDo",
-        fieldDelimiter: ", ",
-        uniqueValueInfos: [
-          {
-            value: "Fukui, Oono", // code for fukui to oono boundaries
-            symbol: FukuiOono,
-            label: "Fukui to Oono"
-          },
-          {
-            value: "Sabae, Fukui", // code for sabae to fukui boundaries
-            symbol: SabaeFukui,
-            label: "Sabae to Fukui"
-          }
-        ]
-      };
+      // // Create a renderer to render specific symbols on top of Boundaries layer
+      // const boundaryRenderer = {
+      //   type: "unique-value", // autocasts as new UniqueValueRenderer()
+      //   legendOptions: {
+      //     title: "Uncertanties:"
+      //   },
+      //   defaultSymbol: otherSym,
+      //   defaultLabel: "DEFAULT LABEL",
+      //   field: "changefr_2",
+      //   field2: "changetoDo",
+      //   fieldDelimiter: ", ",
+      //   uniqueValueInfos: [
+      //     {
+      //       value: "Fukui, Oono", // code for fukui to oono boundaries
+      //       symbol: FukuiOono,
+      //       label: "Fukui to Oono"
+      //     },
+      //     {
+      //       value: "Sabae, Fukui", // code for sabae to fukui boundaries
+      //       symbol: SabaeFukui,
+      //       label: "Sabae to Fukui"
+      //     }
+      //   ]
+      // };
 
-      // Crete a popup template for uncertain boundaries
-      let boundaryChangePopup = {
-        "title": "Boundary Change",
-        "content": "<b>Change From 2:</b> {changefr_2}<br>\
-                    <b>Change To Do:</b> {changetoDo}<br>\
-                    <b>Start Valid:</b> {START_vali}<br>\
-                    <b>End Valid:</b> {END_valid}<br>"
-      }
+      // // Crete a popup template for uncertain boundaries
+      // let boundaryChangePopup = {
+      //   "title": "Boundary Change",
+      //   "content": "<b>Change From 2:</b> {changefr_2}<br>\
+      //               <b>Change To Do:</b> {changetoDo}<br>\
+      //               <b>Start Valid:</b> {START_vali}<br>\
+      //               <b>End Valid:</b> {END_valid}<br>"
+      // }
 
-      // Add boundary-changes layer
-      let boundary_changes = new FeatureLayer({
-        url:
-          "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/0?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
-        renderer: boundaryRenderer,
-        outfields: ["*"],
-        popupTemplate: boundaryChangePopup,
-      })
-      map.layers.add(boundary_changes)
+      // // Add boundary-changes layer
+      // let boundary_changes = new FeatureLayer({
+      //   url:
+      //     "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/overlays/FeatureServer/0?token=3ATb8VJxlM0Q0foAtMo0hpIGD5xuQWrlXNrCpMvc7AaOCVdVe6sG8bV55FBh-d7c5lzD9V9IzSiN6dP7-_F8Drn5cfLXVTsnbP6CRLut0Y1HpPAh-8Huba426E6NDtS7R-54pvPD-aLKRJdW2iayTIyIv4qShZkp1PmP8Ao_gP_SV2Qi3sh8Ef4ueHgD-tjOTruOYTJb3u9IsJCldmqNHOEswwxMPsRYjtqCFi-6HsTPfW-j0vDQIPgEw81TZyza",
+      //   renderer: boundaryRenderer,
+      //   outfields: ["*"],
+      //   popupTemplate: boundaryChangePopup,
+      // })
+      // map.layers.add(boundary_changes)
 
       /* =====================================================================================================
                                   END OF CODE FOR CROboSS HATCHING
@@ -200,8 +270,8 @@ export default {
       // Add the time slider widget
       this.view.ui.add(timeSlider, "bottom-left");
 
-      this.view.whenLayerView(villages_to_domains).then(function() {
-        const fullTimeExtent = villages_to_domains.timeInfo.fullTimeExtent;
+      this.view.whenLayerView(villages).then(function() {
+        const fullTimeExtent = villages.timeInfo.fullTimeExtent;
 
         // set up time slider properties
         timeSlider.fullTimeExtent = fullTimeExtent;
@@ -234,7 +304,7 @@ export default {
         content: new Legend({ view: this.view,
                               layerInfos: [
                               {
-                                layer: villages_to_domains, gun,
+                                layer: villages, gun,
                                 title: "Domains"
                               }]}),
         });
@@ -281,7 +351,7 @@ export default {
       });
 
       // Add bottom right widgets to UI
-      this.view.ui.add([this.legendExpand, exportExpand], "bottom-right")
+      this.view.ui.add([this.legendExpand, exportExpand], "bottom-right");
       // this.legends = legendExpand
 
       /********************************************************************************************
@@ -299,39 +369,59 @@ export default {
         sources: [
           {
             layer: gun,
-            searchFields: ["Gun_Name_R", "gun_name_K"],
-            displayField: "Gun_Name_R",
+            searchFields: this.layerInfo.guns.fields.map(field => {
+              if (field.search)
+                return field.id;
+            }).filter(id => id != null),
+            displayField: this.layerInfo.guns.fields[0].id,
+            // suggestionTemplate: "name: {fukuivil_2}<br> {fukuivil_3}-{fukuivil_4}",
             exactMatch: false,
-            outFields: ["Gun_Name_R", "gun_name_K"],
-            name: "Guns",
-            placeholder: "Search for a Gun",
+            outFields: ["*"],
+            name: this.layerInfo.guns.layer_name,
+            placeholder: `Search for ${this.layerInfo.guns.layer_name}`,
             zoomScale: 100000,
             maxSuggestions: 20,
             maxResults: 20,
           },
           {
-            layer: villages_to_gun,
-            searchFields: ["fukuivil_2", "fukuivil_1"],
-            suggestionTemplate: "name: {fukuivil_2}<br> {fukuivil_3}-{fukuivil_4}",
+            layer: villages,
+            searchFields: this.layerInfo.villages.fields.map(field => {
+              if (field.search)
+                return field.id;
+            }).filter(id => id != null),
+            displayField: this.layerInfo.villages.fields[0].id,
+            // suggestionTemplate: "name: {fukuivil_2}<br> {fukuivil_3}-{fukuivil_4}",
             exactMatch: false,
             outFields: ["*"],
-            placeholder: "Search Villages to Gun",
-            name: "Villages to Gun",
+            name: this.layerInfo.villages.layer_name,
+            placeholder: `Search for ${this.layerInfo.villages.layer_name}`,
+            zoomScale: 100000,
             maxSuggestions: 20,
             maxResults: 20,
           },
-          {
-            layer: villages_to_domains,
-            searchFields: ["fukuivil_3", "Village_Na"],
-            displayField: "Village_Na",
-            exactMatch: false,
-            outFields: ["*"],
-            name: "Villages to Domains",
-            placeholder: "Search Villages to Domain",
-            zoomScale: 10000,
-            maxSuggestions: 20,
-            maxResults: 20,
-          },
+          // {
+          //   layer: villages_to_gun,
+          //   searchFields: ["fukuivil_2", "fukuivil_1"],
+          //   suggestionTemplate: "name: {fukuivil_2}<br> {fukuivil_3}-{fukuivil_4}",
+          //   exactMatch: false,
+          //   outFields: ["*"],
+          //   placeholder: "Search Villages to Gun",
+          //   name: "Villages to Gun",
+          //   maxSuggestions: 20,
+          //   maxResults: 20,
+          // },
+          // {
+          //   layer: villages_to_domains,
+          //   searchFields: ["fukuivil_3", "Village_Na"],
+          //   displayField: "Village_Na",
+          //   exactMatch: false,
+          //   outFields: ["*"],
+          //   name: "Villages to Domains",
+          //   placeholder: "Search Villages to Domain",
+          //   zoomScale: 10000,
+          //   maxSuggestions: 20,
+          //   maxResults: 20,
+          // },
         ]
       });
 
