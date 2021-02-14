@@ -6,7 +6,7 @@
 
 <script>
 
-import { loadModules } from 'esri-loader';
+import { loadModules, setDefaultOptions } from 'esri-loader';
 import Screenshot from './Screenshot.vue';
 
 export default {
@@ -58,10 +58,13 @@ export default {
     }
   },
   mounted() {
+    setDefaultOptions({version: '4.18'});
+
     // lazy load the required ArcGIS API for JavaScript modules and CSS
     loadModules([
       "esri/Map",
       "esri/views/MapView",
+      "esri/core/watchUtils",
       "esri/layers/FeatureLayer",
       "esri/widgets/TimeSlider",
       "esri/widgets/LayerList",
@@ -72,7 +75,7 @@ export default {
       "esri/widgets/Print",
       "esri/widgets/Print/TemplateOptions",
       ], { css: true })
-    .then(([ArcGISMap, MapView, FeatureLayer, TimeSlider, LayerList, Legend, Search, Expand, BasemapGallery,
+    .then(([ArcGISMap, MapView, watchUtils, FeatureLayer, TimeSlider, LayerList, Legend, Search, Expand, BasemapGallery,
             Print, TemplateOptions]) => {
       
       /* ===================================== HELPER FUNCTIONS =========================================== */
@@ -499,8 +502,23 @@ export default {
       });
 
       this.isMounted = true;
-    });
     
+    /* =====================================   LAYER WATCHES    ============================================= */
+    watchUtils.whenTrue(this.view, "stationary", () => {
+      // Get the extent of the view once it has stopped being moved by useVectorBasemaps
+      if (this.view.extent) {
+        var info =
+          "<br> <span> the view extent changed: </span>" +
+          "<br> xmin:" + this.view.extent.xmin.toFixed(2) +
+          " xmax: " + this.view.extent.xmax.toFixed(2) +
+          "<br> ymin:" + this.view.extent.ymin.toFixed(2) +
+          " ymax: " + this.view.extent.ymax.toFixed(2);
+          console.log(info);
+      }
+    });
+
+    /* =====================================   END OF MAP CDOE    ============================================= */
+    });
   },
   beforeDestroy() {
     if (this.view) {
