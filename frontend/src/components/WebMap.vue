@@ -1,23 +1,47 @@
 <template>
-  <div id="viewDiv">
-    <screenshot :view="view" />
+<div id="map">
+  <div class="vld-parent" id="loadScreen"> 
+    <loading :active.sync="isLoading" :is-full-page="fullPage"></loading> 
   </div>
+   <div id="mapView">
+    <screenshot :view="view" />
+    <navbar @changeSettings="updateFilter"></navbar>
+  </div>
+</div>
 </template>
 
 <script>
 
 import { loadModules, setDefaultOptions } from 'esri-loader';
 import Screenshot from './Screenshot.vue';
+import Navbar from './NewNavBar.vue';
+
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   name: 'web-map',
   components: {
     Screenshot, 
+    Loading,
+    Navbar,
   },
   data(){
     return{
       view: null,
       isMounted: false,
+      isLoading: true,
+      fullPage: true,
+      preferences: {
+        domains: {
+          branch: '',
+          uncertainty: '',
+          styling: '',
+        },
+        villages: '',
+        guns: '',
+      },
+      layers:{},
 
       // Objects with feature layer meta data so mounted code does not have to change if data hosted elsewhere or data fields change
       layerInfo: {
@@ -70,7 +94,7 @@ export default {
           ],
         },
         kunis: {
-          layer_name: "Kuni",
+          layer_name: "Kunis",
           service_url: "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Kuni/FeatureServer/0",
           zoom_scale: 10000,
           fields: [
@@ -88,6 +112,36 @@ export default {
       // Map data field names to generic names so code does not have to change when data representation does
       // Old data laters for Fukui only
       // gun_service_url: "https://services1.arcgis.com/7uJv7I3kgh2y7Pe0/arcgis/rest/services/Files_v4/FeatureServer/3?token=mmhhlZVuoCbYWtcVWcZ9AYOUdbomDLEBhIhLba3oMmu6qJx33R8bw-dH2d0f9W7XASmknv6VeIo4DSAvo9E2gRmaqqPxEljkvyf8ZQBRzOXeop6IruZkCdKvzIIX-QhISsuM7fNoztJbdYpnAL-Q2Au9F37giFIxaI1Z6BHG0kDLb9jUphpqxgVeNd5FOkzgogGuhIPBh8-AMTQ8RcsKHCQkxNbVG3GJZsXBMWmi1uqd4ndGnsR0Pn5riTgZEYV-",
+    }
+  },
+  methods: {
+    updateStyling(style){ return style; },
+    updateFilter(form){
+      console.log("New Settings:")
+      console.log(form);
+    },
+
+    /*
+      Helper function to generate popups for feature layers.
+    */
+    genPopup(title, fields) {
+      let fieldInfos = [];
+      fields.forEach(field => {
+        fieldInfos.push({
+          fieldName: field.id,
+          label: field.label,
+          visible: field.visible
+        })
+      })
+
+      // Return expected format for popup to autocast as FieldContent object
+      return { 
+        "title": `<b>${title}</b>`, 
+        "content": [{
+          type: "fields",
+          fieldInfos: fieldInfos, 
+        }],
+      };
     }
   },
   mounted() {
@@ -111,30 +165,6 @@ export default {
     .then(([ArcGISMap, MapView, watchUtils, FeatureLayer, TimeSlider, LayerList, Legend, Search, Expand, BasemapGallery,
             Print, TemplateOptions]) => {
       
-      /* ===================================== HELPER FUNCTIONS =========================================== */
-
-      let genPopup = (title, fields) => {
-        let fieldInfos = [];
-        fields.forEach(field => {
-          // if (field.visable)
-            // content += `<b>${field.name}: </b> {${field.id}}<br>`
-          fieldInfos.push({
-            fieldName: field.id,
-            label: field.label,
-            visible: field.visible
-          })
-        })
-
-        // Return expected format for popup to autocast as FieldContent object
-        return { 
-          "title": `<b>${title}</b>`, 
-          "content": [{
-            type: "fields",
-            fieldInfos: fieldInfos, 
-          }],
-        };
-      }
-
       /* =====================================  INITIALIZE MAP  ============================================= */
 
       const map = new ArcGISMap({ basemap: 'gray-vector' });
@@ -150,37 +180,37 @@ export default {
 
       let guns = new FeatureLayer({ 
         url: this.layerInfo.guns.service_url,
-        popupTemplate: genPopup("Gun Information", this.layerInfo.guns.fields),
+        popupTemplate: this.genPopup("Gun Information", this.layerInfo.guns.fields),
         outfields: ["*"],
       });
       
       let villages = new FeatureLayer({ 
         url: this.layerInfo.villages.service_url,
-        popupTemplate: genPopup("Village Information", this.layerInfo.villages.fields),
+        popupTemplate: this.genPopup("Village Information", this.layerInfo.villages.fields),
         outfields: ["*"],
       });
       
       let domains = new FeatureLayer({ 
         url: this.layerInfo.domains.service_url,
-        popupTemplate: genPopup("Domain Information", this.layerInfo.domains.fields),
+        popupTemplate: this.genPopup("Domain Information", this.layerInfo.domains.fields),
         outfields: ["*"],
       });
 
       let kunis = new FeatureLayer({ 
         url: this.layerInfo.kunis.service_url,
-        popupTemplate: genPopup("Kuni Information", this.layerInfo.kunis.fields),
+        popupTemplate: this.genPopup("Kuni Information", this.layerInfo.kunis.fields),
         outfields: ["*"],
       });
 
       // Keep track of all the references to feature lyaers in our layerInfo object
-      this.layerInfo.guns.featureLayer = guns;
-      this.layerInfo.domains.featureLayer = domains;
-      this.layerInfo.villages.featureLayer = villages;
-      this.layerInfo.kunis.featureLayer = kunis;
+      this.layers.guns = guns;
+      this.layers.domains = domains;
+      this.layers.villages = villages;
+      this.layers.kunis = kunis;
 
       // Add all the feature layers to the map
-      Object.values(this.layerInfo).forEach((layerData) => {
-        map.layers.add(layerData.featureLayer);
+      Object.values(this.layers).forEach((layer) => {
+        map.layers.add(layer);
       })
 
 
@@ -233,12 +263,13 @@ export default {
         expandTooltip: "View Legend", // optional, defaults to "Expand" for English locale
         group: "bottom-right",
         content: 
-          new Legend({ view: this.view,
-                       layerInfos: [ 
-                         { layer: guns, title: "Gun Legend" },
-                         { layer: domains, title: "Domain Legend" },
-                         { layer: kunis, title: "Kuni Legend" },
-                        ]}), 
+          new Legend({ 
+            view: this.view,
+            layerInfos: [ 
+               { layer: guns, title: "Gun Legend" },
+               { layer: domains, title: "Domain Legend" },
+               { layer: kunis, title: "Kuni Legend" }]
+          }), 
       });
 
       /*******************************************  
@@ -298,7 +329,7 @@ export default {
       let searchSources = []
       Object.values(this.layerInfo).forEach((layerData) => {
         let source = {
-          layer: layerData.featureLayer,
+          layer: this.layers[layerData.layer_name.toLowerCase()],
           searchFields: layerData.fields.map(field => {
             if (field.search)
               return field.id;
@@ -354,12 +385,12 @@ export default {
         expandTooltip: "Select a Basemap",
         group: "top-right",
         content: new BasemapGallery({
-                                      view: this.view,
-                                      source: {
-                                        portal: {
-                                          url: "https://www.arcgis.com",
-                                          useVectorBasemaps: true  // Load vector tile basemaps
-                                        }}}),
+          view: this.view,
+          source: {
+            portal: {
+              url: "https://www.arcgis.com",
+              useVectorBasemaps: true  // Load vector tile basemaps
+            }}}),
       });
 
       /*******************************************  
@@ -372,9 +403,9 @@ export default {
         expandTooltip: "Expand LayerList", // optional, defaults to "Expand" for English locale
         group: "top-right",
         content: new LayerList({
-                                container: document.createElement("div"),
-                                view: this.view
-                              }),
+          container: document.createElement("div"),
+          view: this.view
+        }),
       });
 
       /*******************************************  
@@ -413,10 +444,10 @@ export default {
         console.error('Error:', error);
       });
 
-      this.isMounted = true;
     
     /* =====================================   LAYER WATCHES    ============================================= */
 
+    // Skeleton watching for updates to the view extent, will be used laer
     watchUtils.whenTrue(this.view, "stationary", () => {
       // Get the extent of the view once it has stopped being moved by useVectorBasemaps
       if (this.view.extent) {
@@ -503,6 +534,13 @@ export default {
     // })
     // map.layers.add(boundary_changes)
 
+    // Code for the loading screen at beginning
+    setTimeout(() => {
+      console.log("LOADING COMPLETE TIMER")
+      this.isLoading = false
+    }, 12000)
+
+    this.isMounted = true;
     /* =====================================   END OF MAP CDOE    ============================================= */
     });
   },
