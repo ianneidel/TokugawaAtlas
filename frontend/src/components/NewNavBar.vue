@@ -24,6 +24,7 @@
       </b-form-group>
       <p>Select whether to prioritize newcomer vs incumbent.</p>
       <b-form-group>
+        <b-form-radio v-model="form.domains.uncertainty" value="Both">Display both</b-form-radio>
         <b-form-radio v-model="form.domains.uncertainty" value="Newcomer">Newcomer</b-form-radio>
         <b-form-radio v-model="form.domains.uncertainty" value="Incumbent">Incumbent</b-form-radio>
       </b-form-group>
@@ -72,8 +73,8 @@ export default {
       form: {
         domains: {
           branch: 'Branch',
-          uncertainty: 'Newcomer',
-          uncertainTimin: 'Earliest',
+          uncertainty: 'Both',
+          uncertainTiming: 'Earliest',
           styling: 'Domain name'
         },
         villages: 'Small',
