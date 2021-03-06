@@ -19,6 +19,12 @@ import Navbar from './NewNavBar.vue';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
+import { bothrenderer } from './Both.js'
+import { newcomerrenderer } from './Newcomer.js'
+import { incumbentrenderer } from './Incumbent.js'
+
+var domains; //declared since the update code precedes its initialization
+
 export default {
   name: 'web-map',
   components: {
@@ -119,6 +125,14 @@ export default {
     updateFilter(form){
       console.log("New Settings:")
       console.log(form);
+      if (form.domains.uncertainty == 'Both') { //could be improved by checking whether the uncertainty has been changed before updating the renderer
+        domains.renderer = bothrenderer;
+      } else if (form.domains.uncertainty == 'Newcomer') {
+        domains.renderer = newcomerrenderer;
+      } else {
+        domains.renderer = incumbentrenderer;
+      }
+      console.log(form.domains.uncertainty);
     },
 
     /*
@@ -190,9 +204,10 @@ export default {
         outfields: ["*"],
       });
       
-      let domains = new FeatureLayer({ 
+      domains = new FeatureLayer({ 
         url: this.layerInfo.domains.service_url,
         popupTemplate: this.genPopup("Domain Information", this.layerInfo.domains.fields),
+        renderer: bothrenderer,
         outfields: ["*"],
       });
 
