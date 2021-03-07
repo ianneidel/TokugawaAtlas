@@ -19,9 +19,13 @@ import Navbar from './NewNavBar.vue';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
-import { bothrenderer } from './Both.js'
-import { newcomerrenderer } from './Newcomer.js'
-import { incumbentrenderer } from './Incumbent.js'
+// import { hatch_renderer } from '../colors/default-Hatch.js'
+// import { newcomer_renderer } from '../colors/default-Newcomer.js'
+// import { incumbent_renderer } from '../colors/default-Incumbent.js'
+
+import { hatch_renderer } from '../colors/japan-colors-Hatch.js'
+import { newcomer_renderer } from '../colors/japan-colors-Newcomer.js'
+import { incumbent_renderer } from '../colors/japan-colors-Incumbent.js'
 
 var domains; //declared since the update code precedes its initialization
 
@@ -126,11 +130,11 @@ export default {
       console.log("New Settings:")
       console.log(form);
       if (form.domains.uncertainty == 'Both') { //could be improved by checking whether the uncertainty has been changed before updating the renderer
-        domains.renderer = bothrenderer;
+        domains.renderer = hatch_renderer;
       } else if (form.domains.uncertainty == 'Newcomer') {
-        domains.renderer = newcomerrenderer;
+        domains.renderer = newcomer_renderer;
       } else {
-        domains.renderer = incumbentrenderer;
+        domains.renderer = incumbent_renderer;
       }
       console.log(form.domains.uncertainty);
     },
@@ -207,7 +211,7 @@ export default {
       domains = new FeatureLayer({ 
         url: this.layerInfo.domains.service_url,
         popupTemplate: this.genPopup("Domain Information", this.layerInfo.domains.fields),
-        renderer: bothrenderer,
+        renderer: hatch_renderer,
         outfields: ["*"],
       });
 
